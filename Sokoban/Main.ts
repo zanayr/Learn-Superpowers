@@ -20,93 +20,84 @@ enum Tiles {
     Packet = 5
 };
 //  Global variables
-var isLevelWon : boolean = false;
-var levelCount : number = 1;
-var levelMax : number;
-var mapSaved : number[][];
-var playerPosition = new Sup.Math.Vector2( 0, 0 );
+var win : boolean = false;
+var level : number = 1;
+var max : number;
+var saved : number[][];
+var position = new Sup.Math.Vector2( 0, 0 );
 
 //  Game namespace
 namespace Game {
     //  Auxillary functions
-    function checkVictory ( level, boxesNumber, boxesPositions, targetPositions ) {
-        let count : number = 0;
-        for ( let posBox of boxesPositions )
-            for ( let posTarget of targetPositions )
-                if ( posBox.x === posTarget.x && posBox.y === posTarget.y )
-                    count++;
-        if ( count === boxesNumber )
+    function victory ( count, crates, targets ) {
+        let n : number = 0;
+        for ( let crate of crates )
+            for ( let target of targets )
+                if ( crate.x === target.x && crate.y === target.y )
+                    n++;
+        if ( count === n )
             return true;
         return false;
     }
     //  Exported functions
-    export function checkLevel ( level ) {
-        let boxesNumber : number = 0;
-        let boxesPositions = [];
-        let targetPositions = [];
+    export function build () {
+        win = false;
+        Sup.loadScene( 'Game' );
+    }
+    export function check ( map ) {
+        let count : number = 0;
+        let crates = [];
+        let targets = [];
         
         for ( let row = 0; row < 12; row++ ) {
             for (let column = 0; column < 16; column++ ) {
-                let actorTile = level.getTileAt( Layers.Actors, column, row );
-                let worldTile = level.getTileAt( Layers.World, column, row );
+                let actorTile = map.getTileAt( Layers.Actors, column, row );
+                let worldTile = map.getTileAt( Layers.World, column, row );
                 if ( actorTile === Tiles.Crate || actorTile === Tiles.Packet ) {
-                    let position = new Sup.Math.Vector2( column, row );
-                    boxesPositions.push( position );
-                    boxesNumber++;
+                    crates.push( new Sup.Math.Vector2( column, row ) );
+                    count++;
                 }
-                if ( worldTile === Tiles.Target ) {
-                    let position = new Sup.Math.Vector2( column, row );
-                    targetPositions.push( position );
-                }
+                if ( worldTile === Tiles.Target )
+                    targets.push( new Sup.Math.Vector2( column, row ) );
             }
         }
 
-        if ( checkVictory( level, boxesNumber, boxesPositions, targetPositions ) ) {
-            isLevelWon = true;
-            levelCount++;
+        if ( victory( count, crates, targets ) ) {
+            win = true;
+            level++;
         }
     }
-    export function getMaxLevel () {
-        levelMax = 0;
-        for ( let level in LEVELS )
-            levelMax++;
-    }
-    export function getPosition ( level ) {
-        mapSaved = [];
-        playerPosition.x = 0;
-        playerPosition.y = 0;
+    export function getPosition ( map ) {
+        saved = [];
+        position.x = 0;
+        position.y = 0;
         
         for ( let row = 0; row < 12; row++ ) {
-            // Sup.log('row: ', row);
             for ( let column = 0; column < 16; column++ ) {
-                // Sup.log('col: ', column);
-                let actorTile = level.getTileAt( Layers.Actors, column, row );
-                mapSaved.push( actorTile );
+                let actorTile = map.getTileAt( Layers.Actors, column, row );
+                saved.push( actorTile );
                 if ( actorTile === Tiles.Start ) {
-                    level.setTileAt( Layers.Actors, column, row, Tiles.Empty );
-                    playerPosition.add( column, row );
+                    map.setTileAt( Layers.Actors, column, row, Tiles.Empty );
+                    position.add( column, row );
                 }
             }
         }
-        Sup.log(mapSaved);
     }
-    export function resetLevel ( level ) {
+    export function init () {
+        max = Object.keys(LEVELS).length;
+    }
+    export function reset ( map ) {
         let index : number = 0;
         for ( let row = 0; row < 12; row++ ) {
             for (let column = 0; column < 16; column++ ) {
-                level.setTileAt( Layers.Actors, column, row, mapSaved[ index ] );
+                map.setTileAt( Layers.Actors, column, row, saved[ index ] );
                 index++;
             }
         }
-        setLevel();
+        build();
     }
-    export function setLevel () {
-        isLevelWon = false;
-        Sup.loadScene( 'Game' );
-    }
-
 }
 
 
 //  Initialize game
-Game.getMaxLevel();
+Game.init();

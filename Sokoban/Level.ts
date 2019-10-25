@@ -1,14 +1,14 @@
 class LevelBehavior extends Sup.Behavior {
-    level = this.actor.tileMapRenderer;
+    map = this.actor.tileMapRenderer;
 
     awake () {
-        this.level.setTileMap( 'Levels/' + LEVELS[ levelCount ] );
-        Game.getPosition( this.level.getTileMap() );
+        this.map.setTileMap( 'Levels/' + LEVELS[ level ] );
+        Game.getPosition( this.map.getTileMap() );
     }
 
     update () {
-        if ( isLevelWon ) {
-            if ( levelCount === levelMax ) {
+        if ( win ) {
+            if ( level === max ) {
                 Sup.loadScene( 'Victory/Scene' );
             } else {
                 this.actor.getChild( 'Next' ).setVisible( true );
@@ -19,14 +19,14 @@ class LevelBehavior extends Sup.Behavior {
                 this.actor.getChild( 'Next' ).setVisible( false );
                 this.actor.getChild( 'Reset' ).setVisible( true );
 
-                this.level.setTileMap( 'Levels/' + LEVELS[ levelCount ] );
+                this.map.setTileMap( 'Levels/' + LEVELS[ level ] );
 
-                Game.setLevel();
+                Game.build();
             }
         }
 
-        if ( Sup.Input.wasKeyJustPressed( 'R' ) && !isLevelWon ) {
-            Game.resetLevel( this.level.getTileMap() );
+        if ( Sup.Input.wasKeyJustPressed( 'R' ) && !win ) {
+            Game.reset( this.map.getTileMap() );
         }
     }
 }
