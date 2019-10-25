@@ -30,6 +30,7 @@ class PlayerBehavior extends Sup.Behavior {
         }
         if ( canMove ) {
             this.actor.setPosition( playerPosition.x, playerPosition.y );
+            Game.checkLevel( level );
         } else {
             playerPosition.subtract( x, y );
         }

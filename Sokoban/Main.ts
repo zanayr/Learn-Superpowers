@@ -27,7 +27,48 @@ var playerPosition = new Sup.Math.Vector2( 0, 0 );
 
 //  Game namespace
 namespace Game {
+    //  Auxillary functions
+    function checkVictory ( level, boxesNumber, boxesPositions, targetPositions ) {
+        let posBox = new Sup.Math.Vector2;
+        let posTarget = new Sup.Math.Vector2;
+        let count : number = 0;
+
+        for ( posBox of boxesPositions )
+            for ( posTarget of targetPositions )
+                if ( posBox.x === posTarget.x && posBox.y === posTarget.y )
+                    count++;
+        if ( count === boxesNumber )
+            return true;
+        return false;
+    }
     //  Exported functions
+    export function checkLevel ( level ) {
+        let boxesNumber : number = 0;
+        let boxesPositions = [];
+        let targetPositions = [];
+
+        for ( let column = 0; column < 12; column++ ) {
+            for (let row = 0; row < 16; row++ ) {
+                let actorTile = level.GetTileAt( Layers.Actors, row, column );
+                let worldTile = level.GetTileAt( Layers.World, row, column );
+                if (actorTile === Tiles.Crate || actorTile === Tiles.Packet) {
+                    let position = new Sup.Math.Vector2( row, column );
+                    boxesPositions.push( position );
+                    boxesNumber++;
+                }
+                if ( worldTile === Tiles.Target ) {
+                    let position = new Sup.Math.Vector2( row, column );
+                    targetPositions.push( position );
+                }
+            }
+        }
+
+        if ( checkVictory( level, boxesNumber, boxesPositions, targetPositions ) ) {
+            isLevelWon = true;
+            levelCount++;
+            Sup.log('DEBUG : VICTORY'); // temporary log
+        }
+    }
     export function getMaxLevel () {
         levelMax = 0;
         for (let level in LEVELS)
