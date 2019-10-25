@@ -9,7 +9,6 @@ class PlayerBehavior extends Sup.Behavior {
         let level = Sup.getActor( 'Level' ).tileMapRenderer.getTileMap();
         let worldTile = level.getTileAt( Layers.World, playerPosition.x, playerPosition.y );
         let actorTile = level.getTileAt( Layers.Actors, playerPosition.x, playerPosition.y );
-
         if ( worldTile === Tiles.Floor || worldTile === Tiles.Target ) {
             canMove = true;
             if ( actorTile === Tiles.Crate || actorTile === Tiles.Packet ) {
@@ -28,7 +27,7 @@ class PlayerBehavior extends Sup.Behavior {
         } else {
             canMove = false;
         }
-        if ( canMove ) {
+        if ( canMove ) {            
             this.actor.setPosition( playerPosition.x, playerPosition.y );
             Game.checkLevel( level );
         } else {
@@ -38,7 +37,7 @@ class PlayerBehavior extends Sup.Behavior {
 
 
     start () {
-        this.actor.setPosition(playerPosition);
+        this.actor.setPosition( playerPosition );
     }
 
 
@@ -61,4 +60,4 @@ class PlayerBehavior extends Sup.Behavior {
     }
 }
 
-Sup.registerBehavior(PlayerBehavior);
+Sup.registerBehavior( PlayerBehavior );

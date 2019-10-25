@@ -23,18 +23,16 @@ enum Tiles {
 var isLevelWon : boolean = false;
 var levelCount : number = 1;
 var levelMax : number;
+var mapSaved : number[][];
 var playerPosition = new Sup.Math.Vector2( 0, 0 );
 
 //  Game namespace
 namespace Game {
     //  Auxillary functions
     function checkVictory ( level, boxesNumber, boxesPositions, targetPositions ) {
-        let posBox = new Sup.Math.Vector2;
-        let posTarget = new Sup.Math.Vector2;
         let count : number = 0;
-
-        for ( posBox of boxesPositions )
-            for ( posTarget of targetPositions )
+        for ( let posBox of boxesPositions )
+            for ( let posTarget of targetPositions )
                 if ( posBox.x === posTarget.x && posBox.y === posTarget.y )
                     count++;
         if ( count === boxesNumber )
@@ -46,18 +44,18 @@ namespace Game {
         let boxesNumber : number = 0;
         let boxesPositions = [];
         let targetPositions = [];
-
-        for ( let column = 0; column < 12; column++ ) {
-            for (let row = 0; row < 16; row++ ) {
-                let actorTile = level.GetTileAt( Layers.Actors, row, column );
-                let worldTile = level.GetTileAt( Layers.World, row, column );
-                if (actorTile === Tiles.Crate || actorTile === Tiles.Packet) {
-                    let position = new Sup.Math.Vector2( row, column );
+        
+        for ( let row = 0; row < 12; row++ ) {
+            for (let column = 0; column < 16; column++ ) {
+                let actorTile = level.getTileAt( Layers.Actors, column, row );
+                let worldTile = level.getTileAt( Layers.World, column, row );
+                if ( actorTile === Tiles.Crate || actorTile === Tiles.Packet ) {
+                    let position = new Sup.Math.Vector2( column, row );
                     boxesPositions.push( position );
                     boxesNumber++;
                 }
                 if ( worldTile === Tiles.Target ) {
-                    let position = new Sup.Math.Vector2( row, column );
+                    let position = new Sup.Math.Vector2( column, row );
                     targetPositions.push( position );
                 }
             }
@@ -66,27 +64,47 @@ namespace Game {
         if ( checkVictory( level, boxesNumber, boxesPositions, targetPositions ) ) {
             isLevelWon = true;
             levelCount++;
-            Sup.log('DEBUG : VICTORY'); // temporary log
         }
     }
     export function getMaxLevel () {
         levelMax = 0;
-        for (let level in LEVELS)
+        for ( let level in LEVELS )
             levelMax++;
     }
-    export function getPosition (level) {
+    export function getPosition ( level ) {
+        mapSaved = [];
         playerPosition.x = 0;
         playerPosition.y = 0;
-        for (let row = 0; row < 12; row++) {
-            for (let column = 0; column < 16; column++) {
-                let actorTile = level.getTileAt(Layers.Actors, column, row);
-                if (actorTile === Tiles.Start) {
-                    level.setTileAt(Layers.Actors, column, row, Tiles.Empty);
-                    playerPosition.add(column, row);
+        
+        for ( let row = 0; row < 12; row++ ) {
+            // Sup.log('row: ', row);
+            for ( let column = 0; column < 16; column++ ) {
+                // Sup.log('col: ', column);
+                let actorTile = level.getTileAt( Layers.Actors, column, row );
+                mapSaved.push( actorTile );
+                if ( actorTile === Tiles.Start ) {
+                    level.setTileAt( Layers.Actors, column, row, Tiles.Empty );
+                    playerPosition.add( column, row );
                 }
             }
         }
+        Sup.log(mapSaved);
     }
+    export function resetLevel ( level ) {
+        let index : number = 0;
+        for ( let row = 0; row < 12; row++ ) {
+            for (let column = 0; column < 16; column++ ) {
+                level.setTileAt( Layers.Actors, column, row, mapSaved[ index ] );
+                index++;
+            }
+        }
+        setLevel();
+    }
+    export function setLevel () {
+        isLevelWon = false;
+        Sup.loadScene( 'Game' );
+    }
+
 }
 
 
