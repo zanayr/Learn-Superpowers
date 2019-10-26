@@ -3,7 +3,7 @@ class LevelBehavior extends Sup.Behavior {
 
     awake () {
         this.map.setTileMap( 'Levels/' + LEVELS[ level ] );
-        Game.getPosition( this.map.getTileMap() );
+        Game.locate( this.map.getTileMap() );
     }
 
     update () {

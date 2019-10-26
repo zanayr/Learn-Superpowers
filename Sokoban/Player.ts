@@ -1,13 +1,13 @@
 class PlayerBehavior extends Sup.Behavior {
-    //  Player move method
     move ( x, y ) {
+        /*  Should update the player's position, and then get the tile map, */
         let canMove : boolean;
         position.add( x, y );
         
         let map = Sup.getActor( 'Level' ).tileMapRenderer.getTileMap();
         let worldTile = map.getTileAt( Layers.World, position.x, position.y );
         let actorTile = map.getTileAt( Layers.Actors, position.x, position.y );
-        
+
         if ( worldTile === Tiles.Floor || worldTile === Tiles.Target ) {
             canMove = true;
             if ( actorTile === Tiles.Crate || actorTile === Tiles.Packet ) {
