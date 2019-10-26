@@ -1,6 +1,11 @@
 class PlayerBehavior extends Sup.Behavior {
     move ( x, y ) {
-        /*  Should update the player's position, and then get the tile map, */
+        /*  Should update the player's position, and then get the tile map, and the new
+            position's World and Actors tile. If the world tile is a floor tile, or a
+            packet the player can move. After getting the next tiles in the player'd
+            updated direction, check if they are either a floor tile or empty tile. If
+            they are, update the next tiles with the updated tiles. If not, the player
+            cannot move and return the player to their last position.  */
         let canMove : boolean;
         position.add( x, y );
         
@@ -36,11 +41,13 @@ class PlayerBehavior extends Sup.Behavior {
 
 
     start () {
+        /*  Set the player to the start position  */
         this.actor.setPosition( position );
     }
 
 
     update () {
+        /*  Check if the game has been won. Then check for user inputs  */
         if ( !win ) {
             if ( Sup.Input.wasKeyJustPressed( 'UP' ) ) {
                 this.move( 0, 1 );
